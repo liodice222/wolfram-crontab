@@ -1,2 +1,2 @@
 # wolfram-crontab
-crontab job for daily wolfram questions
+crontab job for daily biochemistry questions

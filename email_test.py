@@ -17,10 +17,11 @@ def get_password_from_keychain(account):
     except subprocess.CalledProcessError:
         return None
 
-SENDER_EMAIL = "lea.iodice3@gmail.com"
+SENDER_EMAIL = "iodice.pt@gmail.com"
 SENDER_PASSWORD = get_password_from_keychain(SENDER_EMAIL)
+
 #verify password is stored correctly 
-print(SENDER_PASSWORD)
+#print(SENDER_PASSWORD)
 
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
@@ -37,9 +38,9 @@ def send_html_email():
     html_content = f"""
     <html>
         <body>
-            <h2>Daily Update</h2>
-            <p>Hello! This is your daily email update for {datetime.now().strftime('%Y-%m-%d')}.</p>
-            <p>Have a great day!</p>
+            <h2>Daily Problem!! Wee!</h2>
+            <p>Hello! This is your daily problem for {datetime.now().strftime('%Y-%m-%d')}.</p>
+            <p> <insert problem with api here> /p>
         </body>
     </html>
     """
