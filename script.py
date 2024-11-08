@@ -8,6 +8,7 @@ import requests # type: ignore
 from questions import questions 
 import random
 
+#verify requests is working 
 response = requests.get('https://api.github.com')
 print(response.status_code)
 
