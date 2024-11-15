@@ -1,6 +1,6 @@
 import os
-import openai
-from dotenv import load_dotenv
+import openai # type: ignore
+from dotenv import load_dotenv # type: ignore
 
 # Load environment variables from .env file
 load_dotenv()
@@ -26,9 +26,9 @@ def test_api_key(api_key):
         # Print the success message
         print("Connection Successful: Status Code 200")
         print("Response:", response['choices'][0]['message']['content'].strip())
-    except openai.error.OpenAIError as e:  # Catch all OpenAI-related errors
-        print(f"OpenAI error: {e}")
-        exit(1)
+    # except openai.error.OpenAIError as e:  # Catch all OpenAI-related errors
+    #     print(f"OpenAI error: {e}")
+    #     exit(1)
     except Exception as e:  # Catch other unexpected errors
         print(f"Unexpected error: {e}")
         exit(1)
