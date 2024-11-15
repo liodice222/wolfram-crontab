@@ -18,7 +18,7 @@ def test_api_key(api_key):
     openai.api_key = api_key
     try:
         # Updated method call for the new OpenAI API library version
-        response = openai.ChatCompletion.create(
+        response = openai.chat.Completion.create(
             model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": "Hello"}],
             max_tokens=10
@@ -26,19 +26,10 @@ def test_api_key(api_key):
         # Print the success message
         print("Connection Successful: Status Code 200")
         print("Response:", response['choices'][0]['message']['content'].strip())
-    except openai.error.InvalidRequestError as e:
-        print(f"Invalid request error: {e}")
+    except openai.error.OpenAIError as e:  # Catch all OpenAI-related errors
+        print(f"OpenAI error: {e}")
         exit(1)
-    except openai.error.AuthenticationError:
-        print("Authentication failed: Invalid API key.")
-        exit(1)
-    except openai.error.APIError as e:
-        print(f"API error: {e}")
-        exit(1)
-    except openai.error.RateLimitError:
-        print("Rate limit exceeded. Try again later.")
-        exit(1)
-    except Exception as e:
+    except Exception as e:  # Catch other unexpected errors
         print(f"Unexpected error: {e}")
         exit(1)
 
