@@ -1,78 +1,54 @@
+import subprocess
 import openai
-import keyring
-import random
-import json
+import sys
 
-# Constants
-NUM_QUESTIONS = 10  
-TEMPERATURE = 0.7
-OUTPUT_FILE = 'questions.py'
-
-# Subjects to generate questions for
-subjects = [
-    "Chemistry",
-    "Biology",
-    "Electrical Engineering",
-    "Calculus/Algebra",
-    "Human Physiology",
-    "Physics"
-]
-
-# Function to get API key from keychain
 def get_api_key():
-    return keyring.get_password("openai", "api_key")
-
-# Function to generate a question using OpenAI API
-def generate_question(api_key, subject):
-    prompt = (
-        f"Create a challenging post-baccalaureate level question in {subject} "
-        f"in 50 words, and include one reputable source for the question."
-    )
-    
+    """Fetch the OpenAI API key from macOS Keychain."""
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system", "content": "You are an assistant that creates study questions."},
-                {"role": "user", "content": prompt}
-            ],
-            max_tokens=150,
-            temperature=TEMPERATURE
+        # Using subprocess to execute the security command
+        result = subprocess.run(
+            ["security", "find-generic-password", "-a", "openai_api_key", "-s", "chatgpt_api_key"],
+            capture_output=True,
+            text=True
         )
-        question = response['choices'][0]['message']['content'].strip()
-        return question
+
+        # If the command was successful
+        if result.returncode == 0:
+            api_key = result.stdout.strip()
+            return api_key
+        else:
+            print("Failed to retrieve API key from Keychain.")
+            sys.exit(1)
+
     except Exception as e:
-        print(f"Error generating question for {subject}: {e}")
-        return None
+        print(f"Error fetching API key: {e}")
+        sys.exit(1)
 
-# Main function to generate questions and store them in a dictionary
-def main():
-    api_key = get_api_key()
-    if not api_key:
-        print("API key not found in the keychain. Please add it using keyring.")
-        return
-    
+def test_api_key(api_key):
+    """Test the OpenAI API key by making a simple API request."""
     openai.api_key = api_key
-    questions_dict = {}
-
-    for subject in subjects:
-        questions = []
-        for _ in range(NUM_QUESTIONS):
-            question = generate_question(api_key, subject)
-            if question:
-                questions.append(question)
-            else:
-                print(f"Failed to generate a question for {subject}.")
-        
-        # Store generated questions in the dictionary
-        questions_dict[subject] = questions
-
-    # Save questions to a new Python file as a dictionary
-    with open(OUTPUT_FILE, 'w') as file:
-        file.write("questions = ")
-        json.dump(questions_dict, file, indent=4)
-    
-    print(f"Questions generated and saved in {OUTPUT_FILE}")
+    try:
+        # Making a simple request to check API key validity
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": "Hello"}],
+            max_tokens=5
+        )
+        # If we receive a response, the API key works
+        if response:
+            print("Connection Successful: Status Code 200")
+    except openai.error.AuthenticationError:
+        print("Authentication failed: Invalid API key.")
+        sys.exit(1)
+    except Exception as e:
+        print(f"Error connecting to OpenAI API: {e}")
+        sys.exit(1)
 
 if __name__ == "__main__":
-    main()
+    api_key = get_api_key()
+    test_api_key(api_key)
+ 
+
+
+
+
