@@ -1,6 +1,7 @@
 import openai
 import keyring
 import random
+import subprocess
 from sqlalchemy import create_engine, Column, Integer, String, Boolean
 from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy.exc import SQLAlchemyError
@@ -17,7 +18,8 @@ subjects = [
     "Electrical Engineering",
     "Calculus/Algebra",
     "Human Physiology",
-    "Physics"
+    "Physics",
+    "Immunology"
 ]
 
 # ORM Base
@@ -33,9 +35,20 @@ class Question(Base):
     source = Column(String, nullable=False)
     sent = Column(Boolean, default=False)
 
-# Function to get API key from keychain
-def get_api_key():
-    return keyring.get_password("openai", "api_key")
+# ChatGPT API Setup
+def get_api_key(account):
+    try:
+        return subprocess.run(
+            ["security", "find-generic-password", "-a", account, "-w"],
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.strip()
+    except subprocess.CalledProcessError:
+        return None
+
+OPENAI_API_KEY = get_api_key("openai_api_key")
+
 
 # Function to initialize the database
 def init_db():
@@ -45,7 +58,7 @@ def init_db():
     return Session()
 
 # Function to generate a question using OpenAI API
-def generate_question(api_key, subject):
+def generate_question(openai_api_key, subject):
     prompt = (
         f"Create a challenging post-baccalaureate level question in {subject} "
         f"in 50 words, and include one reputable source for the question."
@@ -89,7 +102,7 @@ def save_question(session, subject, question_text, source):
 
 # Main function to generate and store questions
 def main():
-    api_key = get_api_key()
+    api_key = get_api_key("openai_api_key")
     if not api_key:
         print("API key not found in the keychain. Please add it using keyring.")
         return

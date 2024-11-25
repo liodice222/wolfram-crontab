@@ -28,6 +28,7 @@ def get_api_key_from_keychain(account):
 
 OPENAI_API_KEY = get_api_key_from_keychain("openai_api_key")
 CHATGPT_API_URL = "https://api.openai.com/v1/chat/completions"
+print(OPENAI_API_KEY)
 
 # Email Configuration
 def get_password_from_keychain(account):
