@@ -11,25 +11,6 @@ from questions import questions
 import random
 from db import db_manager
 
-#verify requests is working 
-response = requests.get('https://api.github.com')
-print(response.status_code)
-
-# ChatGPT API Setup
-def get_api_key_from_keychain(account):
-    try:
-        return subprocess.run(
-            ["security", "find-generic-password", "-a", account, "-w"],
-            check=True,
-            capture_output=True,
-            text=True,
-        ).stdout.strip()
-    except subprocess.CalledProcessError:
-        return None
-
-OPENAI_API_KEY = get_api_key_from_keychain("openai_api_key")
-CHATGPT_API_URL = "https://api.openai.com/v1/chat/completions"
-print(OPENAI_API_KEY)
 
 # Email Configuration
 def get_password_from_keychain(account):
